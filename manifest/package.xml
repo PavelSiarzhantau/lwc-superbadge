@@ -5,6 +5,10 @@
 		<name>ActionLinkGroupTemplate</name>
 	</types>
 	<types>
+       <members>*</members>
+       <name>LightningMessageChannel</name>
+    </types>
+	<types>
 		<members>*</members>
 		<name>ApexClass</name>
 	</types>
