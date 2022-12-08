@@ -1,6 +1,6 @@
 <!-- sldsValidatorIgnore -->
 <template>
-    <lightning-tabset variant="scoped">
+    <lightning-tabset variant="scoped" if:true={boats.data}>
       <lightning-tab label="Gallery">
         <div class="slds-scrollable_y">
           <lightning-layout multiple-rows="true" class="slds-grid_align-center" >

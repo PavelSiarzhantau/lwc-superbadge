@@ -27,7 +27,6 @@ export default class BoatSearchResults extends LightningElement {
   _title;
   _message;
   _variant;
-  _wiredData;
   selectedBoatId;
   columns = COLUMNS;
   boatTypeId = '';
@@ -44,7 +43,7 @@ export default class BoatSearchResults extends LightningElement {
       const { data, error } = response;
       this.boats = response;
       if (data) {
-        this.isLoading = true;
+        this.isLoading = false;
         this.notifyLoading(this.isLoading);
       } else if (error) {
           console.log(error);
@@ -56,7 +55,7 @@ export default class BoatSearchResults extends LightningElement {
   @api
   searchBoats(boatTypeId) {
       this.boatTypeId = boatTypeId;
-      this.isLoading = false;
+      this.isLoading = true;
       this.notifyLoading(this.isLoading);
   }
   
@@ -64,11 +63,11 @@ export default class BoatSearchResults extends LightningElement {
   // uses notifyLoading
     @api
     async refresh() {
-        this.isLoading = false;
+        this.isLoading = true;
         this.notifyLoading(this.isLoading);
         await refreshApex(this.boats);
-        this.isLoading = true;
-        await this.notifyLoading(this.isLoading);
+        this.isLoading = false;
+        this.notifyLoading(this.isLoading);
         
    }
   
@@ -93,40 +92,39 @@ export default class BoatSearchResults extends LightningElement {
   // clear lightning-datatable draft values
   handleSave(event) {   
     // notify loading
-      this.isLoading = false;
+      this.isLoading = true;
       this.notifyLoading(this.isLoading);
       const updatedFields = event.detail.draftValues;
       console.log('updatedFields: ' + updatedFields);
     // Update the records via Apex
     updateBoatList({data: updatedFields})
         .then(() => {
-            this.isLoading = true;
-            this.notifyLoading(this.isLoading);
-            this._title = SUCCESS_TITLE;
-            this._message = MESSAGE_SHIP_IT;
-            this._variant = SUCCESS_VARIANT;
-            this.template.querySelector("lightning-datatable").draftValues = [];
-            this.refresh();
-            this.template.querySelector("c-boats-near-me").updateBoatsInfo();
+          const successEvt = new ShowToastEvent({
+            title: SUCCESS_TITLE,
+            message: MESSAGE_SHIP_IT,
+            variant: SUCCESS_VARIANT,
+          });
+          this.dispatchEvent(successEvt);
+          this.template.querySelector("lightning-datatable").draftValues = [];
+          this.refresh();
+          this.template.querySelector("c-boats-near-me").updateBoatsInfo();
         })
-        .catch(error => {
-            this._title = ERROR_TITLE;
-            this._message = error.getMessage();
-            this._variant = ERROR_VARIANT;
+       .catch(error => {
+          const errorEvt = new ShowToastEvent({
+            title: ERROR_TITLE,
+            message: error.message,
+            variant: ERROR_VARIANT
+          });           
+          this.dispatchEvent(errorEvt);
         })
         .finally(() => {
-            const evt = new ShowToastEvent({
-                title: this._title,
-                message: this._message,
-                variant: this._variant,
-            });
-            this.dispatchEvent(evt);
+           
         });
   }
   // Check the current value of isLoading before dispatching the doneloading or loading custom event
-    notifyLoading(isLoading) {
-        const loadingInfo = isLoading ? 'doneloading' : 'loading';
+  notifyLoading(isLoading) {
+        const loadingInfo = isLoading ? 'loading' : 'doneloading';
         const notifyLoadingEvent = new CustomEvent(loadingInfo, { detail: isLoading });
         this.dispatchEvent(notifyLoadingEvent);
-  }
+    }
 }

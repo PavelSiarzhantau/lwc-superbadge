@@ -7,13 +7,13 @@ import { NavigationMixin } from 'lightning/navigation';
     
     // Handles loading event
      handleLoading() {
-         this.isLoading = false;
+         this.isLoading = true;
          console.log('loading');
     }
     
     // Handles done loading event
      handleDoneLoading() {
-         this.isLoading = true;
+         this.isLoading = false;
          console.log('doneLoading');
     }
     

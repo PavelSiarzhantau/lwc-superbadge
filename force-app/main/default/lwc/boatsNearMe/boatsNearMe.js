@@ -36,8 +36,9 @@ export default class BoatsNearMe extends LightningElement {
             title: ERROR_TITLE,
             message: error.getMessage(),
             variant: ERROR_VARIANT,
-        });
-        this.dispatchEvent(evt);
+          });
+          this.isLoading = false;
+          this.dispatchEvent(evt);
       }
   }
   
